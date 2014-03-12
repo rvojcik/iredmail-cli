@@ -12,7 +12,7 @@ It's good to have ability to do some basic thinks via command line. This tool in
 #Currently supported features
 * Add domain
 * Add new mailbox
-* Searech in domains and mailbox
+* Search in domains and mailbox
 
 #TODO
 * Delete domain with all accounts
@@ -28,15 +28,15 @@ It's good to have ability to do some basic thinks via command line. This tool in
 #Installation
 
 Copy script to your sbin directory (for example /usr/local/sbin)
-    sudo cp email-manage.py /usr/local/sbin/
+     sudo cp email-manage.py /usr/local/sbin/
 
 Install python-mysqldb and python-pip to your system. 
 
 In debian/ubuntu run
-    sudo apt-get install python-mysqldb python-pip 
+     sudo apt-get install python-mysqldb python-pip 
 
 You will need new python-prettytable, so use pip radher then system packages
-    sudo pip install prettytable
+     sudo pip install prettytable
 
 
 
