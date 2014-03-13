@@ -153,8 +153,13 @@ def add_object(domain, mailbox):
 
         if not iredutils.is_domain(domain):
             exit_script("Invalid domain name", 1)
+        
+        if args.backupmx:
+            backupmx = 1
+        else:
+            backupmx = 0
 
-        sql = "INSERT INTO domain (domain, defaultlanguage, defaultuserquota) VALUES ('%s','%s',0)" % (domain, settings.default_language)
+        sql = "INSERT INTO domain (domain, defaultlanguage, defaultuserquota, backupmx) VALUES ('%s','%s',0, %d)" % (domain, settings.default_language, backupmx)
 
         # Insert object to database
         if insert_sql_query(db_vmail, sql):
@@ -287,6 +292,7 @@ parser.add_argument("-a", action="store_true", dest="action_add", default=False,
 parser.add_argument("-x", action="store_true", dest="action_delete", default=False, help="Delete domain or mailbox")
 parser.add_argument("-w", action="store_true", dest="action_changepass", default=False, help="Change password for mailbox")
 parser.add_argument("-l", action="store_true", dest="action_search", default=False, help="Print domain, mailbox or find using SEARCH_STRING")
+parser.add_argument("--backup-mx", action="store_true", dest="backupmx", default=False, help="If set, added domain is marked as backup-mx")
 
 args = parser.parse_args()
 

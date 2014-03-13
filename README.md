@@ -14,6 +14,7 @@ It's good to have ability to do some basic thinks via command line. This tool in
 * Add new mailbox
 * Search in domains and mailbox
 * Delete single account
+* Add domain as backup MX
 
 #TODO
 * Delete domain with all accounts
