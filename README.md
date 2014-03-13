@@ -13,10 +13,10 @@ It's good to have ability to do some basic thinks via command line. This tool in
 * Add domain
 * Add new mailbox
 * Search in domains and mailbox
+* Delete single account
 
 #TODO
 * Delete domain with all accounts
-* Delete single account
 
 #Requirements
 * python 2.7
@@ -42,8 +42,16 @@ You will need new python-prettytable, so use pip radher then system packages
      sudo pip install prettytable
 
 
+#Configuration
+
+There is only one thing you need set up. Open email-manage.py and find rows:
+
+    # iRedAdmin location
+    iredadmin_install_path = '/usr/share/apache2/iredadmin'
+
+This variables must point to directory where your iRedAdmin web interface is installed. This is default for Debian/Ubuntu.
 
 
+#Contact
 
-
-
+Robert Vojcik <robert@vojcik.net>
