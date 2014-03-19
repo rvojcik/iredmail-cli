@@ -11,10 +11,11 @@ It's good to have ability to do some basic thinks via command line. This tool in
 
 #Currently supported features
 * Add domain
+* Add domain as backup MX
 * Add new mailbox
+* Add/Update aliases
 * Search in domains and mailbox
 * Delete single account
-* Add domain as backup MX
 
 #TODO
 * Delete domain with all accounts
