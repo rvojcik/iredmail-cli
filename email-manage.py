@@ -91,6 +91,22 @@ def search_database(domain,mailbox,search_string):
         result = send_sql_query(db_vmail, sql)
         print_results(result)
 
+
+def check_alias_exist(dbobject):
+    """Check if alias exist in database"""
+    if iredutils.is_email(dbobject):
+    # Check if email exist
+        sql = "SELECT address FROM alias WHERE address = '%s'" % (dbobject)
+    else:
+        return False
+
+    result = send_sql_query(db_vmail, sql)
+   
+    if result.fetchone() != None:
+        return True
+    else:
+        return False
+
 def check_object_exist(dbobject):
     """Check if domain or mailbox exist in database"""
     if iredutils.is_email(dbobject):
@@ -235,6 +251,38 @@ def add_object(domain, mailbox):
         else:
             exit_script("Error, email not added", 1)
 
+def action_add_alias(address, send_to):
+    """Add alias"""
+
+    # check if domain exist
+    if not address:
+        exit_script("Alias address not specified", 1)
+    if not send_to:
+        exit_script("Alias destination address not specified", 1)
+    domain = address.split('@')[1]
+
+    if iredutils.is_domain(domain):
+        if check_object_exist(domain):
+            if check_alias_exist(address):
+                search_database(False,False,address)
+                ans = raw_input('Would you like to update alias ? (y/n) [n]: ')
+                if ans.lower() == "y":
+                    sql = "UPDATE alias SET goto = '%s' WHERE address = '%s' AND domain = '%s'" % (send_to, address, domain)
+                else:
+                    exit_script("Exiting", 0)
+            else:
+                sql = "INSERT INTO alias (address, goto, domain) VALUES ('%s', '%s', '%s')" % (address, send_to, domain)
+
+            if insert_sql_query(db_vmail,sql):
+                exit_script("Alias updated/added successfully", 0)
+            else:
+                exit_script("Alias not updated/added", 1)
+        else:
+            exit_script("Domain not exist", 1)
+    else:
+        exit_script("Invalid domain name", 1)
+
+
 def action_changepass(mailbox, pass_from_prompt):
     """Changing password for mailbox account"""
 
@@ -292,6 +340,9 @@ parser.add_argument("-a", action="store_true", dest="action_add", default=False,
 parser.add_argument("-x", action="store_true", dest="action_delete", default=False, help="Delete domain or mailbox")
 parser.add_argument("-w", action="store_true", dest="action_changepass", default=False, help="Change password for mailbox")
 parser.add_argument("-l", action="store_true", dest="action_search", default=False, help="Print domain, mailbox or find using SEARCH_STRING")
+parser.add_argument("-A", action="store_true", dest="action_add_alias", default=False, help="Add alias")
+parser.add_argument("--address", dest="alias_address", default=False, help="Alias address")
+parser.add_argument("--send-to", dest="alias_to", default=False, help="Alias destination addresses separated by comas")
 parser.add_argument("--backup-mx", action="store_true", dest="backupmx", default=False, help="If set, added domain is marked as backup-mx")
 
 args = parser.parse_args()
@@ -331,6 +382,8 @@ elif args.action_delete:
     delete_object(args.domain, args.mailbox)
 elif args.action_changepass:
     action_changepass(args.mailbox, args.pass_from_prompt)
+elif args.action_add_alias:
+    action_add_alias(args.alias_address, args.alias_to)
 else:
     print "You have to specify some action\n"
     parser.print_help()
