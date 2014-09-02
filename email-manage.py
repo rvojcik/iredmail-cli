@@ -87,7 +87,8 @@ def search_database(domain,mailbox,search_string):
         result = send_sql_query(db_vmail, sql)
         print_results(result)
         print "Aliases"
-        sql = "SELECT address, goto, name, domain, case when active then 'yes' else 'no' end as 'Active' FROM alias WHERE address like '%" + search_string + "%'"
+        #sql = "SELECT address, goto, name, domain, case when active then 'yes' else 'no' end as 'Active' FROM alias WHERE address like '%" + search_string + "%'"
+        sql = "SELECT address, REPLACE(goto, ',', ',\n') AS goto, name, domain, case when active then 'yes' else 'no' end as 'Active' FROM alias WHERE address like '%" + search_string + "%'"
         result = send_sql_query(db_vmail, sql)
         print_results(result)
 
@@ -178,7 +179,7 @@ def add_object(domain, mailbox):
 
         insert_policyd_status = 1
 
-        sql = "INSERT INTO domain (domain, defaultlanguage, defaultuserquota, backupmx) VALUES ('%s','%s',0, %d)" % (domain, settings.default_language, backupmx)
+        sql = "INSERT INTO domain (domain, settings, backupmx) VALUES ('%s','default_user_quota:0;default_language:%s;max_user_quota:0;',%d)" % (domain, settings.default_language, backupmx)
         # Insert object to database
         if insert_sql_query(db_vmail, sql):
             web_log(domain, 'create', 'Create domain: %s' % (domain))
@@ -217,7 +218,7 @@ def add_object(domain, mailbox):
         pwscheme = None
         if settings.STORE_PASSWORD_IN_PLAIN_TEXT:
             pwscheme = 'PLAIN'
-        password = iredutils.generate_password_for_sql_mail_account(random_string, pwscheme=pwscheme)
+        password = iredpwd.generate_sql_password(random_string, pwscheme=pwscheme)
 
         maildir = iredutils.generate_maildir_path(mailbox)
 
@@ -317,7 +318,7 @@ def action_changepass(mailbox, pass_from_prompt):
     pwscheme = None
     if settings.STORE_PASSWORD_IN_PLAIN_TEXT:
         pwscheme = 'PLAIN'
-    password = iredutils.generate_password_for_sql_mail_account(random_string, pwscheme=pwscheme)
+    password = iredpwd.generate_sql_password(random_string, pwscheme=pwscheme)
 
     # Now update password field in database
     sql = "UPDATE mailbox set password = '%s' WHERE username = '%s'" % (password, mailbox)
@@ -333,7 +334,7 @@ def action_changepass(mailbox, pass_from_prompt):
 try:
     # Import some iRedMail libraries
     import settings
-    from libs import iredutils
+    from libs import iredutils,iredpwd
 except:
     msg = "Could not import iRedAdmin settings, check iredadmin_install_path\nCurrent path is set to: %s" % (iredadmin_install_path)
     exit_script(msg, 1)
@@ -343,20 +344,29 @@ if settings.backend != 'mysql':
 
 
 parser = argparse.ArgumentParser(
-    description='Manage iRedAdmin MySQL from console',
+    description= 'Manage iRedAdmin MySQL from console', 
     epilog='Created by Robert Vojcik <robert@vojcik.net>')
-parser.add_argument("-s", dest="search_string", default=False, help="Search database for mail account")
-parser.add_argument("-d", dest="domain", default=False, help="Search, add or delete domain")
-parser.add_argument("-m", dest="mailbox", default=False, help="Search, add or delete mailbox")
-parser.add_argument("-p", dest="pass_from_prompt", default=False, help="Password used when changing password for mailbox")
-parser.add_argument("-a", action="store_true", dest="action_add", default=False, help="Add domain or mailbox")
-parser.add_argument("-x", action="store_true", dest="action_delete", default=False, help="Delete domain or mailbox")
-parser.add_argument("-w", action="store_true", dest="action_changepass", default=False, help="Change password for mailbox")
-parser.add_argument("-l", action="store_true", dest="action_search", default=False, help="Print domain, mailbox or find using SEARCH_STRING")
-parser.add_argument("-A", action="store_true", dest="action_add_alias", default=False, help="Add alias")
-parser.add_argument("--address", dest="alias_address", default=False, help="Alias address")
-parser.add_argument("--send-to", dest="alias_to", default=False, help="Alias destination addresses separated by comas")
-parser.add_argument("--backup-mx", action="store_true", dest="backupmx", default=False, help="If set, added domain is marked as backup-mx")
+
+listgroup = parser.add_argument_group('List','List aliases and mailboxes')
+listgroup.add_argument("-l", action="store_true", dest="action_search", default=False, help="Print domain, mailbox or find using SEARCH_STRING")
+listgroup.add_argument("-s", dest="search_string", default=False, help="Search database for mail account")
+
+addobject = parser.add_argument_group('Add/Delete','Add or delete aliases, mailboxes and domains')
+addobject.add_argument("-a", action="store_true", dest="action_add", default=False, help="Add domain or mailbox")
+addobject.add_argument("-x", action="store_true", dest="action_delete", default=False, help="Delete domain or mailbox")
+addobject.add_argument("-A", action="store_true", dest="action_add_alias", default=False, help="Add alias")
+addobject.add_argument("--backup-mx", action="store_true", dest="backupmx", default=False, help="If set, added domain is marked as backup-mx")
+addobject.add_argument("--address", dest="alias_address", default=False, help="Alias address")
+addobject.add_argument("--send-to", dest="alias_to", default=False, help="Alias destination addresses separated by comas")
+
+parserchpw = parser.add_argument_group('Change password','Change password for mailbox')
+parserchpw.add_argument("-w", action="store_true", dest="action_changepass", default=False, help="Change password for mailbox")
+parserchpw.add_argument("-p", dest="pass_from_prompt", default=False, help="Password used when changing password for mailbox")
+
+commonargs = parser.add_argument_group('Common options', 'Some of the arguments are common for entire CLI')
+commonargs.add_argument("-d", dest="domain", default=False, help="Search, Add or delete domain")
+commonargs.add_argument("-m", dest="mailbox", default=False, help="Search mailbox, Add new mailbox, Change password for mailbox")
+
 
 args = parser.parse_args()
 
