@@ -7,7 +7,7 @@ import MySQLdb
 from prettytable import from_db_cursor
 
 # iRedAdmin location
-iredadmin_install_path = '/usr/share/apache2/iredadmin'
+iredadmin_install_path = '/usr/share/apache2/iRedAdmin-0.3'
 # Add to path list
 sys.path.append(iredadmin_install_path)
 
@@ -224,7 +224,7 @@ def add_object(domain, mailbox):
 
         if settings.STORE_PASSWORD_IN_PLAIN_TEXT:
             pwscheme = 'PLAIN'
-        password = iredpwd.generate_sql_password(random_string, pwscheme=pwscheme)
+        password = iredutils.generate_password_for_sql_mail_account(random_string, pwscheme=pwscheme)
 
         maildir = iredutils.generate_maildir_path(mailbox)
 
@@ -324,7 +324,7 @@ def action_changepass(mailbox, pass_from_prompt):
     pwscheme = None
     if settings.STORE_PASSWORD_IN_PLAIN_TEXT:
         pwscheme = 'PLAIN'
-    password = iredpwd.generate_sql_password(random_string, pwscheme=pwscheme)
+    password = iredutils.generate_password_for_sql_mail_account(random_string, pwscheme=pwscheme)
 
     # Now update password field in database
     sql = "UPDATE mailbox set password = '%s' WHERE username = '%s'" % (password, mailbox)
@@ -340,7 +340,7 @@ def action_changepass(mailbox, pass_from_prompt):
 try:
     # Import some iRedMail libraries
     import settings
-    from libs import iredutils,iredpwd
+    from libs import iredutils
 except:
     msg = "Could not import iRedAdmin settings, check iredadmin_install_path\nCurrent path is set to: %s" % (iredadmin_install_path)
     exit_script(msg, 1)
