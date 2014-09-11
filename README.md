@@ -29,6 +29,10 @@ It's good to have ability to do some basic thinks via command line. This tool in
 
 #Installation
 
+There are two versions of cli script. Pro and free. 
+Use correct version along with your iredadmin. 
+Pro version for iredadmin pro and free version for iredadmin free version.
+
 Copy script to your sbin directory (for example /usr/local/sbin)
 
      sudo cp email-manage.py /usr/local/sbin/
