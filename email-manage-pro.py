@@ -385,6 +385,7 @@ try:
         passwd=settings.vmail_db_password,
         user=settings.vmail_db_user,
         db=settings.vmail_db_name)
+    send_sql_query(db_vmail, "SET NAMES 'utf8'")
 except MySQLdb.Error, e:
     print "Can't connect to iRedMail Vmail database"
     print "Error %d: %s" % (e.args[0],e.args[1])
@@ -398,6 +399,7 @@ try:
         passwd=settings.iredadmin_db_password,
         user=settings.iredadmin_db_user,
         db=settings.iredadmin_db_name)
+    send_sql_query(db_iredadmin, "SET NAMES 'utf8'")
 except MySQLdb.Error, e:
     print "Can't connect to iRedMail iRedAdmin database"
     print "Error %d: %s" % (e.args[0],e.args[1])
@@ -411,6 +413,7 @@ try:
         passwd=settings.policyd_db_password,
         user=settings.policyd_db_user,
         db=settings.policyd_db_name)
+    send_sql_query(db_policy, "SET NAMES 'utf8'")
 except MySQLdb.Error, e:
     print "Can't connect to iRedMail Policyd database"
     print "Error %d: %s" % (e.args[0],e.args[1])
