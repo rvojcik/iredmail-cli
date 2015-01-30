@@ -92,6 +92,23 @@ def search_database(domain,mailbox,search_string):
         result = send_sql_query(db_vmail, sql)
         print_results(result)
 
+def action_list_user_aliases(user,inpt):
+    """ Func for list aliases which are pointing to user """
+    sql = "SELECT address from alias where goto regexp '^" + user + "|," + user + "';"
+    result = send_sql_query(db_vmail, sql)
+    aliases = list(result)
+    output = set()
+    output.add(user)
+    for alias in aliases:
+        if alias[0] == user:
+            continue
+        if alias[0] in output:
+            continue
+        if inpt and alias[0] in inpt:
+            continue
+        output.update(action_list_user_aliases(alias[0],output))
+
+    return output
 
 def check_alias_exist(dbobject):
     """Check if alias exist in database"""
@@ -364,6 +381,7 @@ addobject.add_argument("-A", action="store_true", dest="action_add_alias", defau
 addobject.add_argument("--backup-mx", action="store_true", dest="backupmx", default=False, help="If set, added domain is marked as backup-mx")
 addobject.add_argument("--address", dest="alias_address", default=False, help="Alias address")
 addobject.add_argument("--send-to", dest="alias_to", default=False, help="Alias destination addresses separated by comas")
+addobject.add_argument("--list-user-aliases", dest="action_list_user_aliases", default=False, help="List aliases directing to username - example petr.burian@livesport.eu")
 
 parserchpw = parser.add_argument_group('Change password','Change password for mailbox')
 parserchpw.add_argument("-w", action="store_true", dest="action_changepass", default=False, help="Change password for mailbox")
@@ -431,6 +449,13 @@ elif args.action_changepass:
     action_changepass(args.mailbox, args.pass_from_prompt)
 elif args.action_add_alias:
     action_add_alias(args.alias_address, args.alias_to)
+elif args.action_list_user_aliases:
+    out=action_list_user_aliases(args.action_list_user_aliases,None)
+    lst = list(out)
+    lst.sort()
+    print "\nAll aliases for user: "+args.action_list_user_aliases+"\n"
+    for i in lst:
+        print i
 else:
     print "You have to specify some action\n"
     parser.print_help()
