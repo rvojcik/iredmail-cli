@@ -263,7 +263,7 @@ def add_object(domain, mailbox):
             print "Username: %s\nPassword: %s\nDomain: %s" % (username, random_string, domain)
             web_log(domain, 'create', 'Create user %s' % (mailbox))
             # Create initial alias
-            sql = "INSERT INTO alias (address, goto, domain) VALUES ('%s', '%s', '%s')" % (username, username, domain)
+            sql = "INSERT INTO alias (address, goto, domain, islist) VALUES ('%s', '%s', '%s', 0)" % (username, username, domain)
             if insert_sql_query(db_vmail, sql):
                 print "Initial alias added"
             else: 
@@ -291,7 +291,7 @@ def action_add_alias(address, send_to):
                 else:
                     exit_script("Exiting", 0)
             else:
-                sql = "INSERT INTO alias (address, goto, domain) VALUES ('%s', '%s', '%s')" % (address, send_to, domain)
+                sql = "INSERT INTO alias (address, goto, domain, islist) VALUES ('%s', '%s', '%s', 1)" % (address, send_to, domain)
 
             if insert_sql_query(db_vmail,sql):
                 exit_script("Alias updated/added successfully", 0)
