@@ -7,7 +7,7 @@ import MySQLdb
 from prettytable import from_db_cursor
 
 # iRedAdmin location
-iredadmin_install_path = '/usr/share/apache2/iRedAdmin-0.3'
+iredadmin_install_path = '/usr/share/apache2/iredadmin'
 # Add to path list
 sys.path.append(iredadmin_install_path)
 
@@ -339,6 +339,11 @@ def action_changepass(mailbox, pass_from_prompt):
         random_string = iredutils.generate_random_strings()
     # Prepare plain or encrypted password
     pwscheme = None
+    try:
+        settings.STORE_PASSWORD_IN_PLAIN_TEXT
+    except:
+        settings.STORE_PASSWORD_IN_PLAIN_TEXT = False
+
     if settings.STORE_PASSWORD_IN_PLAIN_TEXT:
         pwscheme = 'PLAIN'
     password = iredutils.generate_password_for_sql_mail_account(random_string, pwscheme=pwscheme)
