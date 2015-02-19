@@ -241,7 +241,7 @@ def add_object(domain, mailbox):
 
         if settings.STORE_PASSWORD_IN_PLAIN_TEXT:
             pwscheme = 'PLAIN'
-        password = iredpwd.generate_sql_password(random_string, pwscheme=pwscheme)
+        password = iredpwd.generate_password_hash(random_string, pwscheme=pwscheme)
 
         maildir = iredutils.generate_maildir_path(mailbox)
 
@@ -341,7 +341,7 @@ def action_changepass(mailbox, pass_from_prompt):
     pwscheme = None
     if settings.STORE_PASSWORD_IN_PLAIN_TEXT:
         pwscheme = 'PLAIN'
-    password = iredpwd.generate_sql_password(random_string, pwscheme=pwscheme)
+    password = iredpwd.generate_password_hash(random_string, pwscheme=pwscheme)
 
     # Now update password field in database
     sql = "UPDATE mailbox set password = '%s' WHERE username = '%s'" % (password, mailbox)
