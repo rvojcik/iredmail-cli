@@ -184,6 +184,8 @@ def delete_object(domain, mailbox):
 def add_object(domain, mailbox):
     """Add domain or mailbox to iRedMail"""
     if domain:
+        # Remove whitespace chars
+        domain = domain.strip()
 
         if not iredutils.is_domain(domain):
             exit_script("Invalid domain name", 1)
@@ -216,6 +218,8 @@ def add_object(domain, mailbox):
 
 
     elif mailbox:
+        # Remove whitespace chars
+        mailbox = mailbox.strip()
 
         if not iredutils.is_email(mailbox):
             exit_script("Invalid email", 1)
@@ -296,6 +300,10 @@ def action_add_alias(address, send_to):
         exit_script("Alias address not specified", 1)
     if not send_to:
         exit_script("Alias destination address not specified", 1)
+    # Remove whitespaces
+    address = address.strip()
+    send_to = send_to.strip()
+
     domain = address.split('@')[1]
 
     if iredutils.is_domain(domain):
@@ -339,6 +347,11 @@ def action_changepass(mailbox, pass_from_prompt):
         random_string = iredutils.generate_random_strings()
     # Prepare plain or encrypted password
     pwscheme = None
+    try:
+        settings.STORE_PASSWORD_IN_PLAIN_TEXT
+    except:
+        settings.STORE_PASSWORD_IN_PLAIN_TEXT = False
+
     if settings.STORE_PASSWORD_IN_PLAIN_TEXT:
         pwscheme = 'PLAIN'
     password = iredpwd.generate_password_hash(random_string, pwscheme=pwscheme)
