@@ -196,7 +196,7 @@ def add_object(domain, mailbox):
             backupmx = 0
 
 
-        insert_policyd_status = 1
+        #insert_policyd_status = 1
 
         sql = "INSERT INTO domain (domain, settings, backupmx) VALUES ('%s','default_user_quota:0;default_language:%s;max_user_quota:0;',%d)" % (domain, settings.default_language, backupmx)
         # Insert object to database
@@ -205,13 +205,13 @@ def add_object(domain, mailbox):
         else:
             exit_script("Error inserting into vmail database, domain not added", 1)
         
-        sql = "INSERT INTO policy_group_members (PolicyGroupID, Member, Disabled) VALUES (2,'@%s',0)" % (domain)
-        # Insert object to database policyd
-        if insert_sql_query(db_policy, sql):
-            insert_policyd_status = 0
-
-        if insert_policyd_status == 1:
-            exit_script("Domain added but problem during inserting into policy database", 1)
+        #sql = "INSERT INTO policy_group_members (PolicyGroupID, Member, Disabled) VALUES (2,'@%s',0)" % (domain)
+        ## Insert object to database policyd
+        #if insert_sql_query(db_policy, sql):
+        #    insert_policyd_status = 0
+        #
+        #if insert_policyd_status == 1:
+        #    exit_script("Domain added but problem during inserting into policy database", 1)
 
         exit_script("Domain added", 0)
 
@@ -436,19 +436,19 @@ except MySQLdb.Error, e:
     print "Error %d: %s" % (e.args[0],e.args[1])
     exit_script("Database error", 1)
 
-# policy database
-try:
-    db_policy = MySQLdb.connect(
-        host=settings.policyd_db_host,
-        port=int(settings.policyd_db_port),
-        passwd=settings.policyd_db_password,
-        user=settings.policyd_db_user,
-        db=settings.policyd_db_name)
-    send_sql_query(db_policy, "SET NAMES 'utf8'")
-except MySQLdb.Error, e:
-    print "Can't connect to iRedMail Policyd database"
-    print "Error %d: %s" % (e.args[0],e.args[1])
-    exit_script("Database error", 1)
+## policy database
+#try:
+#    db_policy = MySQLdb.connect(
+#        host=settings.policyd_db_host,
+#        port=int(settings.policyd_db_port),
+#        passwd=settings.policyd_db_password,
+#        user=settings.policyd_db_user,
+#        db=settings.policyd_db_name)
+#    send_sql_query(db_policy, "SET NAMES 'utf8'")
+#except MySQLdb.Error, e:
+#    print "Can't connect to iRedMail Policyd database"
+#    print "Error %d: %s" % (e.args[0],e.args[1])
+#    exit_script("Database error", 1)
 
 #}}} Connect to databases
 
