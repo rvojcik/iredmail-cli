@@ -300,6 +300,18 @@ def action_add_alias(address, send_to):
         exit_script("Alias address not specified", 1)
     if not send_to:
         exit_script("Alias destination address not specified", 1)
+
+
+    # Decide, list or alias
+    if "," in send_to:
+        is_list = 1
+        is_alias = 0
+        alias_to = ''
+    else:
+        is_list = 0
+        is_alias = 1
+        alias_to = send_to
+    
     # Remove whitespaces
     address = address.strip()
     send_to = send_to.strip()
@@ -312,11 +324,11 @@ def action_add_alias(address, send_to):
                 search_database(False,False,address)
                 ans = raw_input('Would you like to update alias ? (y/n) [n]: ')
                 if ans.lower() == "y":
-                    sql = "UPDATE alias SET goto = '%s' WHERE address = '%s' AND domain = '%s'" % (send_to, address, domain)
+                    sql = "UPDATE alias SET goto = '%s', islist = %d, is_alias = %d, alias_to = '%s' WHERE address = '%s' AND domain = '%s'" % (send_to, is_list, is_alias, alias_to, address, domain)
                 else:
                     exit_script("Exiting", 0)
             else:
-                sql = "INSERT INTO alias (address, goto, domain, islist) VALUES ('%s', '%s', '%s', 1)" % (address, send_to, domain)
+                sql = "INSERT INTO alias (address, goto, domain, islist, is_alias, alias_to) VALUES ('%s', '%s', '%s', %d, %d, '%s')" % (address, send_to, domain, is_list, is_alias, alias_to)
 
             if insert_sql_query(db_vmail,sql):
                 exit_script("Alias updated/added successfully", 0)
