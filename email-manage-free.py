@@ -7,7 +7,8 @@ import MySQLdb
 from prettytable import from_db_cursor
 
 # iRedAdmin location
-iredadmin_install_path = '/usr/share/apache2/iredadmin'
+#iredadmin_install_path = '/usr/share/apache2/iredadmin'
+iredadmin_install_path = '/opt/www/iredadmin'
 # Add to path list
 sys.path.append(iredadmin_install_path)
 
@@ -88,7 +89,8 @@ def search_database(domain,mailbox,search_string):
         print_results(result)
         print "Aliases"
         #sql = "SELECT address, goto, name, domain, case when active then 'yes' else 'no' end as 'Active' FROM alias WHERE address like '%" + search_string + "%'"
-        sql = "SELECT address, REPLACE(goto, ',', ',\n') AS goto, name, domain, case when active then 'yes' else 'no' end as 'Active' FROM alias WHERE address like '%" + search_string + "%'"
+#        sql = "SELECT address, REPLACE(goto, ',', ',\n') AS goto, name, domain, case when active then 'yes' else 'no' end as 'Active' FROM alias WHERE address like '%" + search_string + "%'"
+        sql = "SELECT address, name, domain, created, expired, active FROM alias WHERE address like '%" + search_string + "%'"
         result = send_sql_query(db_vmail, sql)
         print_results(result)
 
@@ -284,11 +286,13 @@ def add_object(domain, mailbox):
             print "Username: %s\nPassword: %s\nDomain: %s" % (username, random_string, domain)
             web_log(domain, 'create', 'Create user %s' % (mailbox))
             # Create initial alias
-            sql = "INSERT INTO alias (address, goto, domain, islist) VALUES ('%s', '%s', '%s', 0)" % (username, username, domain)
-            if insert_sql_query(db_vmail, sql):
-                print "Initial alias added"
-            else: 
-                exit_script("Initial alias not added", 1)
+            # removed by ingo for versions >= 0.9.7
+            # see DB migration https://docs.iredmail.org/upgrade.iredmail.0.9.6-0.9.7.html#drop-unused-sql-columns-and-records-in-vmailalias-table
+            # sql = "INSERT INTO alias (address, goto, domain, islist) VALUES ('%s', '%s', '%s', 0)" % (username, username, domain)
+            #if insert_sql_query(db_vmail, sql):
+            #    print "Initial alias added"
+            #else: 
+            #    exit_script("Initial alias not added", 1)
         else:
             exit_script("Error, email not added", 1)
 
