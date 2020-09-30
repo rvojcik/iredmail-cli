@@ -1,6 +1,8 @@
 iredmail-cli
 ============
 
+UPDATE: This project is abandoned. I have no longeraccess to iredadmin pro version and don't use iredmail in any of my installations. So no more places to test and develop this project. Sorry. 
+
 iRedMail CLI (MySQL Only)
 Command Line interface to iRedMail Open Source Email server solution
 
